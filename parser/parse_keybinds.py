@@ -131,7 +131,7 @@ def clean_category_name(name):
     n = name.strip()
     n = re.sub(r'^Category:\s*', '', n, flags=re.IGNORECASE)
     n_title = n.title()
-    if n_title in ("Window Groups", "Windows"):
+    if n_title == "Windows":
         return "WIndows"
     return n_title
 
@@ -205,8 +205,8 @@ def get_section_for_category(cat_name):
     c = cat_name.lower()
     def match(keywords):
         return any(re.search(r'\b' + re.escape(x), c) for x in keywords)
-    if match(["workspace", "window", "resize", "cyclenext", "swapnext", "focusmonitor", "group"]):
-        return "Window Management"
+    if match(["workspace", "window", "resize", "resiz", "cyclenext", "swapnext", "focusmonitor", "group", "swapping", "monitor", "client"]):
+        return "Windows"
     if match(["app", "terminal", "browser", "editor", "telegram", "calcurse"]):
         return "Applications"
     if match(["utility", "screenshot", "record", "picker", "clipboard", "emoji"]):
@@ -347,11 +347,29 @@ def is_title_case(s):
     return True
 
 def is_header(comment_text):
-    return (
+    # Allow title-cased comments
+    if (
         len(comment_text) < 40
         and not comment_text.endswith('.')
         and is_title_case(comment_text)
-    )
+    ):
+        return True
+    
+    # Also explicitly allow the specific lowercase category comments from keybinds.conf
+    comment_lower = comment_text.strip().lower()
+    known_headers = [
+        "window groups",
+        "window actions",
+        "client index focus",
+        "screen focus",
+        "resizing",
+        "special workspace toggles",
+        "migrated apps"
+    ]
+    if any(kh in comment_lower for kh in known_headers):
+        return True
+        
+    return False
 
 def parse_configs(variables_files, keybinds_file):
     variables = {}
@@ -443,7 +461,8 @@ def parse_configs(variables_files, keybinds_file):
             if section_match:
                 sec_name = section_match.group(1).strip()
                 get_or_create_section(sec_name)
-                section_explicitly_set = (sec_name != "General")
+                # Only disable auto-routing if it is an explicit 'Section:' comment
+                section_explicitly_set = comment_text.lower().startswith("section:")
                 accumulated_comments.clear()
                 continue
             elif category_match:
@@ -562,7 +581,7 @@ def parse_configs(variables_files, keybinds_file):
             if any(kw in act_lower for kw in window_keywords) or "caelestia toggle" in act_lower or "resizer" in act_lower:
                 is_window_bind = True
                 
-            if is_window_bind and (current_category is None or current_category["category"] in ("Media", "General")):
+            if is_window_bind and (current_category is None or current_category["category"] in ("Media", "General", "WIndows")):
                 # WIndows category
                 if not section_explicitly_set:
                     sec_name = get_section_for_category("WIndows")
