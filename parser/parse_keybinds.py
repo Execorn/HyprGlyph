@@ -461,8 +461,8 @@ def parse_configs(variables_files, keybinds_file):
             if section_match:
                 sec_name = section_match.group(1).strip()
                 get_or_create_section(sec_name)
-                # Only disable auto-routing if it is an explicit 'Section:' comment
-                section_explicitly_set = comment_text.lower().startswith("section:")
+                # Only disable auto-routing if it is an explicit 'Section:' comment and not General
+                section_explicitly_set = comment_text.lower().startswith("section:") and sec_name != "General"
                 accumulated_comments.clear()
                 continue
             elif category_match:
