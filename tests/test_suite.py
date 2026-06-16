@@ -1026,3 +1026,50 @@ def test_parser_bugfixes_caelestia():
         
         # Check third keybind description (from the comment "# Toggle cheatsheet")
         assert keybinds[2]["desc"] == "Toggle cheatsheet"
+
+def test_parser_not_installed():
+    """Test that the parser correctly flags uninstalled and installed packages."""
+    import sys
+    import pathlib
+    sys.path.insert(0, str(pathlib.Path(PARSER_PATH).parent))
+    from parse_keybinds import parse_configs
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_dir = pathlib.Path(tmpdir)
+        var_file = tmp_dir / "variables.conf"
+        key_file = tmp_dir / "keybinds.conf"
+
+        # github-desktop is not installed, whereas ls/sh/cat are definitely installed
+        var_file.write_text("$terminal = cat\n$missing = github-desktop\n")
+        key_file.write_text(
+            "bind = Super, A, exec, app2unit -- $terminal\n"
+            "bind = Super, B, exec, app2unit -- $missing\n"
+            "bind = Super, C, exec, app2unit -- non_existent_command_xyz\n"
+            "bind = Super, D, exec, ls -l\n"
+        )
+
+        sections = parse_configs([var_file], key_file)
+        
+        # Find keybinds
+        keybinds = []
+        for sec in sections:
+            for cat in sec["categories"]:
+                keybinds.extend(cat["keybinds"])
+
+        # We expect 4 keybinds
+        assert len(keybinds) == 4
+        
+        # Super, A -> cat (installed)
+        assert keybinds[0]["notInstalled"] is False
+        
+        # Super, B -> github-desktop (not installed)
+        assert keybinds[1]["notInstalled"] is True
+        assert keybinds[1]["appName"] == "github-desktop"
+        
+        # Super, C -> non_existent_command_xyz (not installed)
+        assert keybinds[2]["notInstalled"] is True
+        assert keybinds[2]["appName"] == "non_existent_command_xyz"
+        
+        # Super, D -> ls (installed)
+        assert keybinds[3]["notInstalled"] is False

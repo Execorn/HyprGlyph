@@ -5,6 +5,7 @@ import re
 import json
 import argparse
 from pathlib import Path
+import shutil
 
 # Normalization map for modifiers
 MOD_NORMALIZATION = {
@@ -371,6 +372,38 @@ def is_header(comment_text):
         
     return False
 
+def get_executable_from_action(action, variables=None):
+    act = action.strip()
+    if not act.startswith("exec "):
+        return None
+        
+    cmd = act[5:].strip()
+    if variables:
+        cmd = resolve_variables(cmd, variables)
+        
+    # Match app2unit -- <app>
+    match = re.search(r'app2unit\s+.*--\s+([a-zA-Z0-9_\-\.\$]+)', cmd)
+    if match:
+        return match.group(1).strip()
+        
+    words = cmd.split()
+    if not words:
+        return None
+        
+    first_word = words[0]
+    if "=" in first_word:
+        for word in words[1:]:
+            if "=" not in word:
+                first_word = word
+                break
+                
+    first_word = re.split(r'[&\|;><]', first_word)[0].strip()
+    
+    if first_word.startswith('$'):
+        return None
+        
+    return first_word
+
 def parse_configs(variables_files, keybinds_file):
     variables = {}
     
@@ -533,6 +566,16 @@ def parse_configs(variables_files, keybinds_file):
             else:
                 action = f"{dispatcher}, {arguments}" if arguments else dispatcher
                 
+            not_installed = False
+            app_name = ""
+            if dispatcher == "exec":
+                binary = get_executable_from_action(action, variables)
+                if binary:
+                    binary_clean = os.path.basename(binary.split()[0]) if not os.path.isabs(binary) else binary
+                    if not shutil.which(binary_clean) and not shutil.which(binary):
+                        not_installed = True
+                        app_name = binary_clean
+            
             # Filter internal/unwanted keybindings (catchalls, mouse binds, interrupts)
             key_lower = key_str.lower().strip()
             act_lower = action.lower().strip()
@@ -604,7 +647,9 @@ def parse_configs(variables_files, keybinds_file):
                 "mods": mods,
                 "key": key,
                 "action": action,
-                "desc": desc
+                "desc": desc,
+                "notInstalled": not_installed,
+                "appName": app_name
             })
             accumulated_comments.clear()
             continue
@@ -653,8 +698,10 @@ def main():
     sections = parse_configs(var_paths, keybinds_path)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w', encoding='utf-8') as f:
+    tmp_output = output_path.with_suffix(".json.tmp")
+    with open(tmp_output, 'w', encoding='utf-8') as f:
         json.dump(sections, f, indent=2)
+    os.replace(tmp_output, output_path)
 
 if __name__ == "__main__":
     main()
