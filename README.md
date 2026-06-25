@@ -13,7 +13,6 @@ Instead of maintaining duplicate cheatsheet tables that go out of sync every tim
 ## 📸 Preview
 
 ![HyprGlyph Cheatsheet UI](assets/screenshot.png)
-*Drop a screenshot of your riced cheatsheet window in `assets/screenshot.png` to showcase the interface on GitHub & r/unixporn!*
 
 ---
 
@@ -49,7 +48,7 @@ graph TD
 ### 1. Clone the repository
 Clone this project into your local development or projects folder:
 ```bash
-git clone https://github.com/YourUsername/hyprland_cheat_sheet.git ~/programming/projects/hyprland_cheat_sheet
+git clone https://github.com/Execorn/HyprGlyph.git ~/programming/projects/HyprGlyph
 ```
 
 ### 2. Configure defaults or environment variables
