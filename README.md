@@ -1,18 +1,18 @@
-# 🗺️ HyprLegends
+# ⌨️ HyprGlyph
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Test Suite](https://img.shields.io/badge/Tests-67%20Passed-success.svg)](#testing)
 [![Shell Integration](https://img.shields.io/badge/Desktop-Hyprland-turquoise.svg)](https://hyprland.org)
 
-**HyprLegends** is a clean, lightning-fast, and automated keybinding parser and cheatsheet generator for the Hyprland compositor. 
+**HyprGlyph** is a clean, lightning-fast, and automated keybinding parser and cheatsheet generator for the Hyprland compositor. 
 
-Instead of maintaining duplicate cheatsheet tables that go out of sync every time you modify your window manager config, **HyprLegends** extracts keybindings dynamically directly from your configuration files. It resolves variables, filters out system actions, groups related shortcuts, and outputs a structured JSON schema ready to power stunning desktop overlays (like QML, Eww, or AGS drawers).
+Instead of maintaining duplicate cheatsheet tables that go out of sync every time you modify your window manager config, **HyprGlyph** extracts keybindings dynamically directly from your configuration files. It resolves variables, filters out system actions, groups related shortcuts, and outputs a structured JSON schema ready to power stunning desktop overlays (like QML, Eww, or AGS drawers).
 
 ---
 
 ## 📸 Preview
 
-![HyprLegends Cheatsheet UI](assets/screenshot.png)
+![HyprGlyph Cheatsheet UI](assets/screenshot.png)
 *Drop a screenshot of your riced cheatsheet window in `assets/screenshot.png` to showcase the interface on GitHub & r/unixporn!*
 
 ---
@@ -32,7 +32,7 @@ Instead of maintaining duplicate cheatsheet tables that go out of sync every tim
 
 ```mermaid
 graph TD
-    A[variables.conf] --> C(HyprLegends Parser)
+    A[variables.conf] --> C(HyprGlyph Parser)
     B[keybinds.conf] --> C
     C -->|1. Parse & Resolve| D[Variable Map]
     C -->|2. Categorize & Clean| E[Section Matrix]
