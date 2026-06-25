@@ -6,7 +6,8 @@ import tempfile
 import pathlib
 import pytest
 
-PARSER_PATH = "/home/execorn/teamwork_projects/hyprland_cheat_sheet/parser/parse_keybinds.py"
+TESTS_DIR = pathlib.Path(__file__).parent.resolve()
+PARSER_PATH = str(TESTS_DIR.parent / "parser" / "parse_keybinds.py")
 
 def run_parser(variables_paths, keybinds_path, output_path):
     cmd = ["python3", PARSER_PATH]

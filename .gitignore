@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / unit tests
+.pytest_cache/
+.phpunit.result.cache
+htmlcov/
+.tox/
+.nosenv/
+.exec/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# Output JSONs and temporary files
+*.json
+*.json.tmp
+*.log
+/assets/screenshot.png

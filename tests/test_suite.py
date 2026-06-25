@@ -8,7 +8,8 @@ import shutil
 import pytest
 
 # Constants
-PARSER_PATH = "/home/execorn/teamwork_projects/hyprland_cheat_sheet/parser/parse_keybinds.py"
+TESTS_DIR = pathlib.Path(__file__).parent.resolve()
+PARSER_PATH = str(TESTS_DIR.parent / "parser" / "parse_keybinds.py")
 USER_KEYBINDS_CONF = pathlib.Path(os.environ.get("CAELESTIA_KEYBINDS_CONF", "~/.local/share/caelestia/hypr/hyprland/keybinds.conf")).expanduser()
 USER_VARIABLES_CONF = pathlib.Path(os.environ.get("CAELESTIA_VARIABLES_CONF", "~/.local/share/caelestia/hypr/variables.conf")).expanduser()
 USER_KEYBINDS_JSON = pathlib.Path(os.environ.get("CAELESTIA_KEYBINDS_JSON", "~/.local/state/caelestia/keybinds.json")).expanduser()
@@ -36,7 +37,7 @@ has_environment = has_quickshell and has_caelestia and has_hyprctl and is_qs_run
 # --- Helpers ---
 
 def load_mock_config(category):
-    mock_dir = pathlib.Path("/home/execorn/teamwork_projects/hyprland_cheat_sheet/tests/mock_configs") / category
+    mock_dir = TESTS_DIR / "mock_configs" / category
     var_file = mock_dir / "variables.conf"
     key_file = mock_dir / "keybinds.conf"
     

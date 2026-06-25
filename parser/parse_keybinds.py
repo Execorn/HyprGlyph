@@ -670,21 +670,20 @@ def parse_configs(variables_files, keybinds_file):
             cleaned_sections.append(sec)
 
     return cleaned_sections
-
 def main():
     parser = argparse.ArgumentParser(description="Parse Hyprland keybindings and variables configurations.")
-    
+    home = Path.home()
     env_var_conf = os.environ.get("CAELESTIA_VARIABLES_CONF")
     if env_var_conf:
         default_variables = [p.strip() for p in env_var_conf.replace(",", " ").split() if p.strip()]
     else:
         default_variables = [
-            "/home/execorn/.local/share/caelestia/hypr/variables.conf",
-            "/home/execorn/.local/share/caelestia/hypr/scheme/current.conf"
+            str(home / ".local/share/caelestia/hypr/variables.conf"),
+            str(home / ".local/share/caelestia/hypr/scheme/current.conf")
         ]
         
-    default_keybinds = os.environ.get("CAELESTIA_KEYBINDS_CONF", "/home/execorn/.local/share/caelestia/hypr/hyprland/keybinds.conf")
-    default_output = os.environ.get("CAELESTIA_KEYBINDS_JSON", "/home/execorn/.local/state/caelestia/keybinds.json")
+    default_keybinds = os.environ.get("CAELESTIA_KEYBINDS_CONF", str(home / ".local/share/caelestia/hypr/hyprland/keybinds.conf"))
+    default_output = os.environ.get("CAELESTIA_KEYBINDS_JSON", str(home / ".local/state/caelestia/keybinds.json"))
 
     parser.add_argument("--variables", nargs="+", default=default_variables, help="Path to variables configurations")
     parser.add_argument("--keybinds", default=default_keybinds, help="Path to keybindings configuration")
