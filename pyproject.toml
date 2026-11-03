@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hyprglyph"
+version = "1.0.0"
+description = "Keybinding parser and cheatsheet generator for Hyprland with AST resolution, native Lua support, and structured JSON export."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "Execorn" }
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Desktop Environment",
+    "Topic :: Utilities",
+]
+keywords = [
+    "hyprland",
+    "wayland",
+    "keybindings",
+    "cheatsheet",
+    "lua",
+    "ast",
+    "parser",
+    "linux",
+]
+dependencies = []
+
+[project.scripts]
+hyprglyph = "parser.parse_keybinds:main"
+
+[project.urls]
+Homepage = "https://github.com/Execorn/HyprGlyph"
+Repository = "https://github.com/Execorn/HyprGlyph.git"
+Issues = "https://github.com/Execorn/HyprGlyph/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["parser"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "W291", "W293", "E402"]

@@ -653,6 +653,29 @@ def parse_conf_configs(variables_files, keybinds_file):
 
     return cleaned_sections
 
+def split_lua_comment(line):
+    """Split a Lua line into code and trailing inline comment in a quote-aware manner."""
+    in_single_quote = False
+    in_double_quote = False
+    i = 0
+    n = len(line)
+    while i < n:
+        c = line[i]
+        if c == "\\":
+            i += 2
+            continue
+        elif c == "'" and not in_double_quote:
+            in_single_quote = not in_single_quote
+        elif c == '"' and not in_single_quote:
+            in_double_quote = not in_double_quote
+        elif not in_single_quote and not in_double_quote:
+            if line[i:i + 2] == "--":
+                code = line[:i]
+                comment = line[i + 2:].strip()
+                return code, comment
+        i += 1
+    return line, ""
+
 def parse_lua_variables(var_paths):
     variables = {}
     if isinstance(var_paths, (str, Path)):
@@ -663,7 +686,8 @@ def parse_lua_variables(var_paths):
             continue
         text = p.read_text(encoding="utf-8")
         for line in text.splitlines():
-            line = line.split("--")[0].strip()
+            code, _ = split_lua_comment(line)
+            line = code.strip()
             if not line:
                 continue
             m = re.match(r"^([a-zA-Z0-9_]+)\s*=\s*(.*?),?$", line)
@@ -1101,15 +1125,19 @@ def parse_lua_configs(var_paths, keybinds_path):
             call_lines = []
             open_parens = 0
             started = False
+            inline_comment = ""
             while i < n:
                 cur_l = lines[i]
-                for ch in cur_l:
+                code_part, comment_part = split_lua_comment(cur_l)
+                if comment_part:
+                    inline_comment = comment_part
+                for ch in code_part:
                     if ch == '(':
                         open_parens += 1
                         started = True
                     elif ch == ')':
                         open_parens -= 1
-                call_lines.append(cur_l)
+                call_lines.append(code_part)
                 if started and open_parens <= 0:
                     break
                 i += 1
@@ -1123,7 +1151,7 @@ def parse_lua_configs(var_paths, keybinds_path):
                     raw_keys = call_args[0]
                     raw_action = call_args[1]
                     if raw_keys.strip() not in ("key", "keybinds"):
-                        add_keybind(raw_keys, raw_action)
+                        add_keybind(raw_keys, raw_action, inline_comment=inline_comment)
             accumulated_comments.clear()
             i += 1
             continue

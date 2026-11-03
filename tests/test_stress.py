@@ -1,10 +1,7 @@
-import os
-import sys
 import json
+import pathlib
 import subprocess
 import tempfile
-import pathlib
-import pytest
 
 TESTS_DIR = pathlib.Path(__file__).parent.resolve()
 PARSER_PATH = str(TESTS_DIR.parent / "parser" / "parse_keybinds.py")

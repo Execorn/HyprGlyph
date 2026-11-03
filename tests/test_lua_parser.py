@@ -78,6 +78,8 @@ def test_parse_configs_auto_detection_and_fallback(tmp_path):
     validate_json_schema(sections)
 
 def test_cli_execution_with_lua_defaults(tmp_path):
+    if not REAL_KEYBINDS_LUA.exists():
+        pytest.skip("Default caelestia Lua config files not found on host")
     out_file = tmp_path / "keybinds_output.json"
     res = subprocess.run(
         ["python3", str(PARSER_SCRIPT), "--output", str(out_file)],
@@ -96,7 +98,7 @@ def test_cli_execution_with_custom_lua_snippet(tmp_path):
     sample_vars = tmp_path / "custom_vars.lua"
     sample_vars.write_text('''
 return {
-    terminal = "alacritty",
+    terminal = "alacritty --hold",
     browser = "chromium",
     mainMod = "SUPER",
 }
@@ -111,8 +113,7 @@ end
 -- Category: Launchers
 -- Terminal emulator
 bind("SUPER, Return", "exec " .. terminal)
--- Web browser
-bind("SUPER + SHIFT, B", "exec " .. browser)
+bind("SUPER + SHIFT, B", "exec " .. browser) -- Launch Chromium Browser
 ''')
     out_file = tmp_path / "custom_out.json"
     res = subprocess.run(
@@ -135,6 +136,8 @@ bind("SUPER + SHIFT, B", "exec " .. browser)
     kbs = data[0]["categories"][0]["keybinds"]
     assert len(kbs) == 2
     assert kbs[0]["key"] == "Return"
-    assert kbs[0]["action"] == "exec alacritty"
+    assert kbs[0]["action"] == "exec alacritty --hold"
+    assert kbs[0]["desc"] == "Terminal emulator"
     assert kbs[1]["key"] == "B"
     assert kbs[1]["action"] == "exec chromium"
+    assert kbs[1]["desc"] == "Launch Chromium Browser"
