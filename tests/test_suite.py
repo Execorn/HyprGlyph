@@ -759,6 +759,8 @@ def test_t2_integration_quickshell_reload_behavior():
 
 def test_t2_integration_start_drawer_before_quickshell():
     """T2: Behavior when starting drawer state service before quickshell is active."""
+    if not has_caelestia:
+        pytest.skip("caelestia binary not found on host")
     res = subprocess.run(["caelestia", "shell", "invalid_msg"], capture_output=True)
     assert res.returncode in (0, 1, 2)
 
